@@ -1,0 +1,192 @@
+# version: '3.8'
+
+
+services:
+  patientdb:
+    image: mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: patient_schema
+      # MYSQL_USER: root
+      # MYSQL_PASSWORD: root
+    volumes:
+      - /home/karishma/Documents/MedWeb/Volumes/Patientdb:/var/lib/mysql
+    networks:
+      - medweb-network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      retries: 5
+      timeout: 60s
+  admindb:
+    image: mysql
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: admin_schema
+      # MYSQL_USER: root
+      # MYSQL_PASSWORD: root
+    volumes:
+      - /home/karishma/Documents/MedWeb/Volumes/Admindb:/var/lib/mysql
+    networks:
+      - medweb-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      retries: 5
+      timeout: 60s
+
+  cmsdb:
+    image: mysql
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cms_schema
+      # MYSQL_USER: root
+      # MYSQL_PASSWORD: root
+    volumes:
+      - /home/karishma/Documents/MedWeb/Volumes/CMSdb:/var/lib/mysql
+    networks:
+      - medweb-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      retries: 3
+      timeout: 10s
+
+
+  hisdb:
+    image: mysql
+    ports:
+      - "3370:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: his_schema
+      # MYSQL_USER: root
+      # MYSQL_PASSWORD: root
+    volumes:
+      - /home/karishma/Documents/MedWeb/Volumes/HISdb:/var/lib/mysql
+    networks:
+      - medweb-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      retries: 5
+      timeout: 60s
+
+#  check-patientdb-started:
+#    image: jwilder/dockerize:0.6.1
+#    depends_on:
+#      patientdb:
+#        condition: service_healthy
+#    command: 'dockerize -wait=tcp://patientdb:3307'
+#    # command: 'dockerize -wait=tcp://patientdb:3308'
+#
+#  # check-cmsdb-started:
+#  #   image: jwilder/dockerize:0.6.1
+#  #   depends_on:
+#  #     cmsdb:
+#  #       condition: service_healthy
+#  #   command: 'dockerize -wait=tcp://patientdb:3308'
+#
+  patient-service:
+    image: karishma056/patient-service
+    # command:
+    ports:
+      - "8081:8081"
+    depends_on:
+      patientdb:
+              condition: service_healthy
+    networks:
+      - medweb-network
+    restart: on-failure:1
+
+  his-service:
+    image: karishma056/his-service
+    # command:
+    ports:
+      - "8085:8085"
+    depends_on:
+      hisdb:
+        condition: service_healthy
+    networks:
+      - medweb-network
+    restart: on-failure:1
+#
+#  check-admindb-started:
+#    image: jwilder/dockerize:0.6.1
+#    depends_on:
+#      admindb:
+#        condition: service_healthy
+#    command: 'dockerize -wait=tcp://admindb:3309'
+#    # command: 'dockerize -wait=tcp://patientdb:3308'
+#
+#  check-cmsdb-started:
+#    image: jwilder/dockerize:0.6.1
+#    depends_on:
+#      cmsdb:
+#        condition: service_healthy
+#    command: 'dockerize -wait=tcp://cmsdb:3308'
+#
+  admin-service:
+    image: karishma056/admin-service
+    # command:
+    ports:
+      - "8082:8082"
+    depends_on:
+      admindb:
+        condition: service_healthy
+    networks:
+      - medweb-network
+    restart: on-failure:1
+
+
+  cms-service:
+    image: karishma056/cms-service
+    # command:
+    ports:
+      - "8084:8084"
+    depends_on:
+      cmsdb:
+        condition: service_healthy
+    # networks:
+    #   - PatientApp-net2
+    restart: on-failure:1
+    networks:
+      - medweb-network
+
+
+
+  patientapp:
+    image: karishma056/patient-app
+    ports:
+      - "3081:3000"
+    depends_on:
+      - patient-service
+    networks:
+      - medweb-network
+
+
+  hisaapp:
+    image: karishma056/his-app
+    ports:
+      - "3085:3000"
+    depends_on:
+      - his-service
+    networks:
+      - medweb-network
+
+
+networks:
+  medweb-network:
+    driver: bridge
+
+#
+#  docker-compose -f Docker-compose-all.yml up
+
+
+# docker run --name patient-service --network patientapp-net -p 8081:8080 -d patient-service:latest
+# docker run --name patientdb --network patientapp-net
+# --mount type=bind,source=/media/karishma/473c21eb-0090-4791-8d4c-c6e6ebe14bac/volumes,target=/var/lib/mysql
+# -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=patient_schema -d mysql:latest
+# docker run -it --name patientapp2 --network patientapp-net -p 3084:3000 patientapp:latest

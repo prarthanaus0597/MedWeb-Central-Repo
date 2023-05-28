@@ -1,0 +1,110 @@
+# version: '3.8'
+
+
+services:
+  hisadb:
+    image: mysql
+    ports:
+      - "3380:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: his_schema
+      # MYSQL_USER: root
+      # MYSQL_PASSWORD: root
+    volumes:
+      - /media/karishma/473c21eb-0090-4791-8d4c-c6e6ebe14bac/hisaVolume:/var/lib/mysql
+    networks:
+      - PatientApp-net2
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      retries: 5
+      timeout: 60s
+
+  # check-patientdb-started: 
+  #   image: jwilder/dockerize:0.6.1
+  #   depends_on:
+  #     patientdb:
+  #       condition: service_healthy
+  #   command: 'dockerize -wait=tcp://patientdb:3307'
+    # command: 'dockerize -wait=tcp://patientdb:3308'
+  
+  # check-cmsdb-started: 
+  #   image: jwilder/dockerize:0.6.1
+  #   depends_on:
+  #     cmsdb:
+  #       condition: service_healthy
+  #   command: 'dockerize -wait=tcp://patientdb:3308'
+
+  hisa_service:
+    image: hisa_service
+    # command: 
+    ports:
+      - "8080:8080"
+    depends_on:
+      hisadb:
+        condition: service_healthy
+    networks:
+      - PatientApp-net2
+    restart: on-failure:1
+
+  # cmsdb:
+  #   image: mysql
+  #   ports:
+  #     - "3308:3306"
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: cms_schema
+  #     # MYSQL_USER: root
+  #     # MYSQL_PASSWORD: root
+  #   volumes:
+  #     - /media/karishma/473c21eb-0090-4791-8d4c-c6e6ebe14bac/cmsVolume:/var/lib/mysql
+  #   networks:
+  #     - PatientApp-net2
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+  #     retries: 3
+  #     timeout: 10s
+
+
+
+  hisaappfrontend:
+    image: hisaapp
+    ports:
+      - "3080:3000"
+    depends_on:
+      - hisa_service
+    networks:
+      - PatientApp-net2
+
+  # cms-service:
+  #   image: cms-service
+  #   # command: 
+  #   ports:
+  #     - "8084:8084"
+  #   depends_on:
+  #     - check-cmsdb-started
+  #   # networks:
+  #   #   - PatientApp-net2
+  #   restart: on-failure:1
+  #   networks:
+  #     - PatientApp-net2
+  
+
+# networks:
+#   PatientApp-net:
+#     driver: bridge
+  # networks:
+  #   network1:
+  #      name: PatientApp-net
+  #   external: true
+networks:
+  PatientApp-net2:
+    name: PatientApp-net
+    external: true
+
+
+# docker run --name patient-service --network patientapp-net -p 8081:8080 -d patient-service:latest
+# docker run --name patientdb --network patientapp-net 
+# --mount type=bind,source=/media/karishma/473c21eb-0090-4791-8d4c-c6e6ebe14bac/volumes,target=/var/lib/mysql 
+# -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=patient_schema -d mysql:latest
+# docker run -it --name patientapp2 --network patientapp-net -p 3084:3000 patientapp:latest

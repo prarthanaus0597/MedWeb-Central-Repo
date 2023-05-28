@@ -1,0 +1,33 @@
+INSERT INTO `pending_requests` VALUES 
+('PR01','2023-05-31 00:00:00.000000','2023-03-30 00:00:00.000000','PAT4351','Analysis','2023-04-28 00:00:00.000000','E01','Kavery Hospital','D02','Vaishnavi','D01','Fever','MusclePain','Headache ','2023-05-02 00:00:00.000000'),
+('PR02','2023-03-30 00:00:00.000000','2023-05-31 00:00:00.000000','PAT4351','Rule out certain allergies','2023-04-28 00:00:00.000000','E01','Kavery Hospital','D02','Vaishnavi','D01','Fever','MusclePain','Headache ','2023-05-02 00:00:00.000000');
+
+
+
+
+INSERT INTO `consentmapping` VALUES 
+('CID044','E01','MR0433',1,'D03','Fever','Pain','Allergy'),
+('CID044','E01','MR0499',1,'D03','Fever','Pain','Allergy'),
+('CID075','E01','MR0414',0,'D01','Allergy','Pain','Diabetes'),
+('CID075','E01','MR0420',0,'D03','Allergy','Pain','Diabetes'),
+('CID075','E02','MR0433',0,'D03','Allergy','Pain','Diabetes'),
+('CID075','E01','MR0434',0,'D03','Allergy','Pain','Diabetes'),
+('CID100','E02','MR0448',1,'D01','Fever','Allergy','Pain'),
+('CID101','E02','MR0433',1,'D02','Fever','Allergy','Pain'),
+('CID289','E01','MR0414',1,'D01','Cough', 'Head ache',  'Nausea'),
+('CID289','E01','MR0415',1,'D02','Cough','Head ache','Nausea'),
+('CID289','E02','MR0417',1,'D02','Cough','Head ache' ,'Nausea'),
+('CID5','E01','MR090',1,'D01','Fever','Cough','Pain'),
+('CID83','E01','MR068',1,'D01','Fever','Body Pain','Sore Throat'),
+('CID901','E01','MR068',1,'D01','Fever','Body Pain','Sore Throat'),
+('CID943','E01','MR0434',0,'D03','Allergy ','Cough ','Pain'),
+('CID948','E02','MR0448',1,'D02','Fever','Allergy','Pain'),
+('CID949','E01','MR0416',1,'D01','Cough','Head ache','Nausea'),
+('CID950','E01','MR0433',1,'D03','Sorethroat' ,'Fever' ,'Vomit'),
+('CID951','E01','MR0469',1,'D03','Sorethroat','Fever', 'Vomit'),
+('CID952','E02','MR0449',1,'D02','Fever','Allergy', 'Pain'),
+('CID990','E01','MR090',1,'D01','Fever','Cough','Pain'),
+('CR017','E01','MR0414',0,'D01','Allergy','Pain','Fever'),
+('CR017','E01','MR0415',0,'D02','Allergy','Pain','Fever'),
+('CR017','E01','MR0420',0,'D03','Allergy','Pain','Fever'),
+('CR017','E01','MR0434',0,'D03','Allergy','Pain','Fever');
